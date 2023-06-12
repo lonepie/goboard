@@ -4,16 +4,19 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"strings"
 
+	"github.com/atotto/clipboard"
+	fuzzyfinder "github.com/ktr0731/go-fuzzyfinder"
 	"github.com/lonepie/goboard/internal/clipboardmonitor"
 	"github.com/spf13/cobra"
 )
 
-// monitorCmd represents the monitor command
-var monitorCmd = &cobra.Command{
-	Use:   "monitor",
+// fzfCmd represents the fzf command
+var fzfCmd = &cobra.Command{
+	Use:   "fzf",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -22,32 +25,35 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("monitor called")
-		startMonitor()
+		log.Println("fzf called")
+		fzf()
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(monitorCmd)
+	rootCmd.AddCommand(fzfCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// monitorCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// fzfCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// monitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// fzfCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-func startMonitor() {
-	monitor, err := clipboardmonitor.NewClipboardMonitor(dbPath)
+func fzf() {
+	db, err := clipboardmonitor.NewClipboardDB(dbPath)
 	if err != nil {
-		log.Fatalln("Error:", err)
+		log.Println("Error: ", err)
 	}
-	log.Println("Monitoring Clipboard...")
-	for entry := range monitor.EntryChan {
-		log.Println("New clip:", strings.TrimSpace(entry.Data))
-	}
+	entries, _ := db.ReadEntries()
+	index, _ := fuzzyfinder.Find(entries, func(i int) string {
+		return fmt.Sprintf("[%v] %s", entries[i].RowID, strings.TrimSpace(entries[i].Data))
+	})
+	log.Println("Selected item:", index)
+	clipboard.WriteAll(entries[index].Data)
+	// entries[index].WriteToClipboard()
 }

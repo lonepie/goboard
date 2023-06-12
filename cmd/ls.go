@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/lonepie/goboard/internal/clipboardmonitor"
@@ -30,11 +31,11 @@ to quickly create a Cobra application.`,
 func ls() {
 	db, err := clipboardmonitor.NewClipboardDB("clipboard.db")
 	if err != nil {
-		fmt.Println("Error: ", err)
+		log.Println("Error: ", err)
 	}
 	entries, _ := db.ReadEntries()
-	for i, entry := range entries {
-		fmt.Println(i, strings.TrimSpace(entry.Data))
+	for _, entry := range entries {
+		fmt.Println(entry.RowID, strings.TrimSpace(entry.Data))
 	}
 }
 

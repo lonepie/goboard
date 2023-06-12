@@ -3,7 +3,7 @@ package clipboardmonitor
 import (
 	"context"
 	"crypto/md5"
-	"io"
+	"fmt"
 	"log"
 	"time"
 
@@ -31,10 +31,11 @@ func NewClipboardMonitor(dbPath string) (*ClipboardMonitor, error) {
 	return monitor, nil
 }
 
-func hash(data string) []byte {
-	h := md5.New()
-	io.WriteString(h, data)
-	return h.Sum(nil)
+func hash(data string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(data)))
+	// h := md5.New()
+	// h.Write([]byte(data))
+	// return hex.EncodeToString(h.Sum(nil))
 }
 
 // monitorClipboard monitors the clipboard for changes and inserts new entries into the database.
@@ -46,7 +47,6 @@ func (monitor *ClipboardMonitor) monitorClipboard() {
 
 	ch := clipboard.Watch(context.Background(), clipboard.FmtText)
 	for data := range ch {
-		//fmt.Println(data)
 		strData := string(data)
 		entry := ClipboardEntry{
 			ID:        hash(strData),
@@ -57,3 +57,9 @@ func (monitor *ClipboardMonitor) monitorClipboard() {
 		monitor.EntryChan <- entry
 	}
 }
+
+// func (entry *ClipboardEntry) WriteToClipboard() {
+// 	clipboard.Init()
+// 	clipboard.Write(clipboard.FmtText, []byte(entry.Data))
+// 	log.Println("Wrote entry to clipboard:", entry.RowID)
+// }

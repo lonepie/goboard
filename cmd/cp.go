@@ -5,15 +5,16 @@ package cmd
 
 import (
 	"log"
-	"strings"
+	"strconv"
 
+	"github.com/atotto/clipboard"
 	"github.com/lonepie/goboard/internal/clipboardmonitor"
 	"github.com/spf13/cobra"
 )
 
-// monitorCmd represents the monitor command
-var monitorCmd = &cobra.Command{
-	Use:   "monitor",
+// cpCmd represents the cp command
+var cpCmd = &cobra.Command{
+	Use:   "cp <id>",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -21,33 +22,36 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("monitor called")
-		startMonitor()
+		log.Println("cp called", args)
+		id, err := strconv.Atoi(args[0])
+		if err != nil {
+			log.Fatalln("Error: argument 'id' must be an integer")
+		}
+		db, err := clipboardmonitor.NewClipboardDB(dbPath)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+		entry, err := db.GetEntry(id)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+		clipboard.WriteAll(entry.Data)
+		log.Println("Wrote entry to clipboard:", entry.RowID)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(monitorCmd)
+	rootCmd.AddCommand(cpCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// monitorCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// cpCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// monitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func startMonitor() {
-	monitor, err := clipboardmonitor.NewClipboardMonitor(dbPath)
-	if err != nil {
-		log.Fatalln("Error:", err)
-	}
-	log.Println("Monitoring Clipboard...")
-	for entry := range monitor.EntryChan {
-		log.Println("New clip:", strings.TrimSpace(entry.Data))
-	}
+	// cpCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
