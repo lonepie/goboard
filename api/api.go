@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/lonepie/goboard/internal/clipboardmonitor"
@@ -12,12 +13,20 @@ import (
 func StartAPI() {
 	router := gin.Default()
 
+	corsConfig := cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowCredentials: true,
+	}
+
+	router.Use(cors.New(corsConfig))
 	router.Use(static.Serve("/", static.LocalFile("./frontend/dist", false)))
 
 	api := router.Group("/api")
 	{
-		api.GET("clipboard", getAllClipboardEntries)
-
+		api.GET("/clipboard", getAllClipboardEntries)
+		// api.PUT("clipboard/:id", updateClipboardEntry)
 	}
 
 	// router.Static("/frontend", "./frontend/dist")

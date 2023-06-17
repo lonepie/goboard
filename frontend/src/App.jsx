@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 // import viteLogo from '/vite.svg'
 // import './App.css'
 // import { styled } from '@mui/material/styles'
-import { Box, TextField, Typography } from '@mui/material'
+import { AppBar, Avatar, Box, Grid, Paper, TextField, Typography } from '@mui/material'
+import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import ClipboardList from './components/ClipboardList'
+import { blue, blueGrey } from '@mui/material/colors';
 
 
 function App() {
@@ -29,33 +31,26 @@ function App() {
 
   return (
     <>
-      {/* <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
-      <Typography variant='h1' gutterBottom>
-        goBoard Clipboard Entries
-      </Typography>
-      <Box sx={{ bgcolor: 'background.paper'}}>
+    <AppBar position='static'>
+      <Grid container>
+        <Grid item>
+          <Avatar sx={{ bgcolor: blue[500], display: 'flex', mr: 1 }}>
+            <ContentPasteIcon />
+          </Avatar>
+        </Grid>
+        <Grid item>
+          <Typography variant='h6' noWrap component='a' href='/' sx={{ display: 'flex', mr: 2, textDecoration: 'none', color: 'inherit', lineHeight: '2em' }}>
+            goBoard Entries
+          </Typography>
+        </Grid>
+      </Grid>
+    </AppBar>
+    <Paper>
+      <Box>
         <TextField label="Filter" value={filterText} onChange={handleFilterChange} fullWidth margin='normal' />
         <ClipboardList entries={filteredEntries} />
       </Box>
+    </Paper>
     </>
   )
 }
