@@ -17,15 +17,10 @@ import (
 // fzfCmd represents the fzf command
 var fzfCmd = &cobra.Command{
 	Use:   "fzf",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Fuzzy-find clipboard history",
+	Long:  `Use fuzzyfinder to search clipboard history and select an item to copy to clipboard.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Println("fzf called")
+		// log.Println("fzf called")
 		fzf()
 	},
 }
@@ -50,10 +45,16 @@ func fzf() {
 		log.Println("Error: ", err)
 	}
 	entries, _ := db.ReadEntries()
-	index, _ := fuzzyfinder.Find(entries, func(i int) string {
+	index, err := fuzzyfinder.Find(entries, func(i int) string {
 		return fmt.Sprintf("[%v] %s", entries[i].RowID, strings.TrimSpace(entries[i].Data))
 	})
-	log.Println("Selected item:", index)
-	clipboard.WriteAll(entries[index].Data)
-	// entries[index].WriteToClipboard()
+	if err != nil {
+		log.Printf("Error selecting clipboard entry: %v\n", err)
+		return
+	}
+	if index >= 0 && index < len(entries) {
+		log.Println("Selected item:", index)
+		clipboard.WriteAll(entries[index].Data)
+		// entries[index].WriteToClipboard()
+	}
 }
