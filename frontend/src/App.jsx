@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react'
 // import viteLogo from '/vite.svg'
 // import './App.css'
 // import { styled } from '@mui/material/styles'
-import { AppBar, Avatar, Box, Grid, Paper, TextField, Typography } from '@mui/material'
+import { AppBar, Avatar, Box, Button, Grid, IconButton, Paper, TextField, Toolbar, Typography } from '@mui/material'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import ClipboardList from './components/ClipboardList'
-import { blue, blueGrey } from '@mui/material/colors';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import ClipboardList from './components/ClipboardList';
 
 
 function App() {
@@ -15,14 +15,22 @@ function App() {
   const [filterText, setFilterText] = useState('');
 
   useEffect(() => {
+    fetchClipboardEntries();
+  }, []);
+
+  const fetchClipboardEntries = () => {
     fetch("http://localhost:3000/api/clipboard")
       .then((response) => response.json())
       .then((data) => setClipboardEntries(data))
       .catch((error) => console.log(error));
-  }, []);
+  };
 
   const handleFilterChange = (event) => {
     setFilterText(event.target.value);
+  };
+  
+  const handleRefresh = () => {
+    fetchClipboardEntries();
   };
 
   const filteredEntries = clipboardEntries.filter((entry) =>
@@ -31,24 +39,23 @@ function App() {
 
   return (
     <>
-    <AppBar position='static'>
-      <Grid container>
-        <Grid item>
-          <Avatar sx={{ bgcolor: blue[500], display: 'flex', mr: 1 }}>
+    <AppBar color='primary' position='static'>
+      <Toolbar>
+          <Avatar sx={{ color: 'text.primary', bgcolor: 'primary.main', display: 'flex', mr: 1 }}>
             <ContentPasteIcon />
           </Avatar>
-        </Grid>
-        <Grid item>
-          <Typography variant='h6' noWrap component='a' href='/' sx={{ display: 'flex', mr: 2, textDecoration: 'none', color: 'inherit', lineHeight: '2em' }}>
+          <Typography variant='h6' noWrap component='div' sx={{ display: 'flex', mr: 2, textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
             goBoard Entries
           </Typography>
-        </Grid>
-      </Grid>
+          <Box>
+            <Button variant='outlined' startIcon={<RefreshIcon />} onClick={handleRefresh}>Refresh</Button>
+          </Box>
+      </Toolbar>
     </AppBar>
     <Paper>
       <Box>
         <TextField label="Filter" value={filterText} onChange={handleFilterChange} fullWidth margin='normal' />
-        <ClipboardList entries={filteredEntries} />
+        <ClipboardList entries={filteredEntries} filterText={filterText} fetchClipboardEntries={fetchClipboardEntries} />
       </Box>
     </Paper>
     </>
