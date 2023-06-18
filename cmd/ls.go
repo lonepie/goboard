@@ -24,7 +24,7 @@ var lsCmd = &cobra.Command{
 }
 
 func ls() {
-	db, err := clipboardmonitor.NewClipboardDB("clipboard.db")
+	db, err := clipboardmonitor.NewClipboardDB(dbPath)
 	if err != nil {
 		log.Println("Error: ", err)
 	}

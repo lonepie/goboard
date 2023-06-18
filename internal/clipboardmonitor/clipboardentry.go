@@ -9,16 +9,18 @@ import (
 
 // ClipboardEntry represents an entry in the clipboard.
 type ClipboardEntry struct {
-	ID        string
-	Data      string
-	Timestamp time.Time
-	RowID     int
+	ID        string    `json:"ID"`
+	Data      string    `json:"Data"`
+	Timestamp time.Time `json:"Timestamp"`
+	RowID     int       `json:"RowID"`
 }
 
 // ClipboardDB represents the clipboard database.
 type ClipboardDB struct {
 	*sql.DB
 }
+
+var clipboardDB *ClipboardDB
 
 // NewClipboardDB creates a new ClipboardDB instance.
 func NewClipboardDB(dbPath string) (*ClipboardDB, error) {
@@ -37,7 +39,18 @@ func NewClipboardDB(dbPath string) (*ClipboardDB, error) {
 		return nil, err
 	}
 
-	return &ClipboardDB{db}, nil
+	clipboardDB = &ClipboardDB{db}
+	return clipboardDB, nil
+}
+
+func GetClipboardDB() *ClipboardDB {
+	// if clipboardDB != nil {
+	// 	return clipboardDB
+	// }
+	// cdb, _ := NewClipboardDB("clipboard.db")
+	// return cdb
+	// return nil
+	return clipboardDB
 }
 
 // Close closes the clipboard database connection.
@@ -59,7 +72,7 @@ func (cdb *ClipboardDB) Save(entry *ClipboardEntry) error {
 
 // ReadEntries reads all clipboard entries.
 func (cdb *ClipboardDB) ReadEntries() ([]*ClipboardEntry, error) {
-	rows, err := cdb.Query("SELECT id, data, timestamp, rowid FROM clipboard")
+	rows, err := cdb.Query("SELECT id, data, timestamp, rowid FROM clipboard ORDER BY rowid DESC")
 	if err != nil {
 		return nil, err
 	}
@@ -93,13 +106,13 @@ func (cdb *ClipboardDB) GetEntry(rowID int) (*ClipboardEntry, error) {
 }
 
 // UpdateEntry updates an existing clipboard entry.
-// func (cdb *ClipboardDB) UpdateEntry(entry ClipboardEntry) error {
-// 	_, err := cdb.db.Exec("UPDATE clipboard SET data = ?, timestamp = ? WHERE id = ?", entry.Data, entry.Timestamp, entry.ID)
-// 	return err
-// }
+func (cdb *ClipboardDB) UpdateEntry(entry ClipboardEntry) error {
+	_, err := cdb.Exec("UPDATE clipboard SET data = ?, timestamp = ? WHERE id = ?", entry.Data, entry.Timestamp, entry.ID)
+	return err
+}
 
-// // DeleteEntry deletes a clipboard entry by ID.
-// func (cdb *ClipboardDB) DeleteEntry(id int) error {
-// 	_, err := cdb.db.Exec("DELETE FROM clipboard WHERE id = ?", id)
-// 	return err
-// }
+// DeleteEntry deletes a clipboard entry by ID.
+func (cdb *ClipboardDB) DeleteEntry(id string) error {
+	_, err := cdb.Exec("DELETE FROM clipboard WHERE id = ?", id)
+	return err
+}

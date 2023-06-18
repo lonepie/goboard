@@ -4,8 +4,6 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/lonepie/goboard/api"
 	"github.com/spf13/cobra"
 )
@@ -14,10 +12,10 @@ import (
 var webCmd = &cobra.Command{
 	Use:   "web",
 	Short: "Start web API server",
-	Long:  `Start web API server listening on port 6000 by default.`,
+	Long:  `Start web API server listening on port 3000 by default.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("web called")
-		api.StartAPI()
+		// fmt.Println("web called")
+		api.StartAPI(dbPath)
 	},
 }
 
