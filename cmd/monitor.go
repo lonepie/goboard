@@ -57,7 +57,7 @@ func init() {
 }
 
 func startMonitor() {
-	monitor, err := clipboardmonitor.NewClipboardMonitor(dbPath)
+	monitor, err := clipboardmonitor.InitClipboardMonitor(dbPath)
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}

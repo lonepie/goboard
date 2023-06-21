@@ -8,7 +8,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/lonepie/goboard/internal/clipboardmonitor"
+	"github.com/lonepie/goboard/internal/db"
 	"github.com/spf13/cobra"
 )
 
@@ -24,11 +24,11 @@ var lsCmd = &cobra.Command{
 }
 
 func ls() {
-	db, err := clipboardmonitor.NewClipboardDB(dbPath)
+	cbdb, err := db.InitClipboardDB(dbPath)
 	if err != nil {
 		log.Println("Error: ", err)
 	}
-	entries, _ := db.ReadEntries()
+	entries, _ := cbdb.ReadEntries()
 	for _, entry := range entries {
 		fmt.Println(entry.RowID, strings.TrimSpace(entry.Data))
 	}

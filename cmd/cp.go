@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	"github.com/atotto/clipboard"
-	"github.com/lonepie/goboard/internal/clipboardmonitor"
+	"github.com/lonepie/goboard/internal/db"
 	"github.com/spf13/cobra"
 )
 
@@ -24,11 +24,11 @@ var cpCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln("Error: argument 'id' must be an integer")
 		}
-		db, err := clipboardmonitor.NewClipboardDB(dbPath)
+		cbdb, err := db.InitClipboardDB(dbPath)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
-		entry, err := db.GetEntry(id)
+		entry, err := cbdb.GetEntry(id)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}

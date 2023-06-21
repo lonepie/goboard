@@ -10,7 +10,7 @@ import (
 
 	"github.com/atotto/clipboard"
 	fuzzyfinder "github.com/ktr0731/go-fuzzyfinder"
-	"github.com/lonepie/goboard/internal/clipboardmonitor"
+	"github.com/lonepie/goboard/internal/db"
 	"github.com/spf13/cobra"
 )
 
@@ -40,11 +40,11 @@ func init() {
 }
 
 func fzf() {
-	db, err := clipboardmonitor.NewClipboardDB(dbPath)
+	cbdb, err := db.InitClipboardDB(dbPath)
 	if err != nil {
 		log.Println("Error: ", err)
 	}
-	entries, _ := db.ReadEntries()
+	entries, _ := cbdb.ReadEntries()
 	index, err := fuzzyfinder.Find(entries, func(i int) string {
 		return fmt.Sprintf("[%v] %s", entries[i].RowID, strings.TrimSpace(entries[i].Data))
 	})

@@ -1,19 +1,19 @@
-package clipboardmonitor
+package db
 
 import (
 	"database/sql"
-	"time"
 
+	m "github.com/lonepie/goboard/internal/model"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // ClipboardEntry represents an entry in the clipboard.
-type ClipboardEntry struct {
-	ID        string    `json:"ID"`
-	Data      string    `json:"Data"`
-	Timestamp time.Time `json:"Timestamp"`
-	RowID     int       `json:"RowID"`
-}
+// type ClipboardEntry struct {
+// 	ID        string    `json:"ID"`
+// 	Data      string    `json:"Data"`
+// 	Timestamp time.Time `json:"Timestamp"`
+// 	RowID     int       `json:"RowID"`
+// }
 
 // ClipboardDB represents the clipboard database.
 type ClipboardDB struct {
@@ -22,8 +22,8 @@ type ClipboardDB struct {
 
 var clipboardDB *ClipboardDB
 
-// NewClipboardDB creates a new ClipboardDB instance.
-func NewClipboardDB(dbPath string) (*ClipboardDB, error) {
+// InitClipboardDB creates a new ClipboardDB instance.
+func InitClipboardDB(dbPath string) (*ClipboardDB, error) {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
@@ -40,6 +40,8 @@ func NewClipboardDB(dbPath string) (*ClipboardDB, error) {
 	}
 
 	clipboardDB = &ClipboardDB{db}
+	defer clipboardDB.Close()
+
 	return clipboardDB, nil
 }
 
@@ -53,34 +55,23 @@ func GetClipboardDB() *ClipboardDB {
 	return clipboardDB
 }
 
-// Close closes the clipboard database connection.
-// func (cdb *ClipboardDB) Close() error {
-// 	return cdb.Close()
-// }
-
-// CreateEntry creates a new clipboard entry.
-// func (cdb *ClipboardDB) CreateEntry(data string) error {
-// 	_, err := cdb.db.Exec("INSERT INTO clipboard (data) VALUES (?)", data)
-// 	return err
-// }
-
 // Save inserts or replaces a ClipboardEntry in the ClipboardDB
-func (cdb *ClipboardDB) Save(entry *ClipboardEntry) error {
+func (cdb *ClipboardDB) Save(entry *m.ClipboardEntry) error {
 	_, err := cdb.Exec("INSERT OR REPLACE INTO clipboard (id, data, timestamp) VALUES (?, ?, ?)", entry.ID, entry.Data, entry.Timestamp)
 	return err
 }
 
 // ReadEntries reads all clipboard entries.
-func (cdb *ClipboardDB) ReadEntries() ([]*ClipboardEntry, error) {
+func (cdb *ClipboardDB) ReadEntries() ([]*m.ClipboardEntry, error) {
 	rows, err := cdb.Query("SELECT id, data, timestamp, rowid FROM clipboard ORDER BY rowid DESC")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	entries := []*ClipboardEntry{}
+	entries := []*m.ClipboardEntry{}
 	for rows.Next() {
-		entry := &ClipboardEntry{}
+		entry := &m.ClipboardEntry{}
 		err := rows.Scan(&entry.ID, &entry.Data, &entry.Timestamp, &entry.RowID)
 		if err != nil {
 			return nil, err
@@ -92,13 +83,13 @@ func (cdb *ClipboardDB) ReadEntries() ([]*ClipboardEntry, error) {
 }
 
 // GetEntry gets a specific ClipboardEntry by RowID
-func (cdb *ClipboardDB) GetEntry(rowID int) (*ClipboardEntry, error) {
+func (cdb *ClipboardDB) GetEntry(rowID int) (*m.ClipboardEntry, error) {
 	rows, err := cdb.Query("SELECT id, data, timestamp, rowid FROM clipboard WHERE rowid = ?", rowID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	entry := &ClipboardEntry{}
+	entry := &m.ClipboardEntry{}
 	for rows.Next() {
 		rows.Scan(&entry.ID, &entry.Data, &entry.Timestamp, &entry.RowID)
 	}
@@ -106,7 +97,7 @@ func (cdb *ClipboardDB) GetEntry(rowID int) (*ClipboardEntry, error) {
 }
 
 // UpdateEntry updates an existing clipboard entry.
-func (cdb *ClipboardDB) UpdateEntry(entry ClipboardEntry) error {
+func (cdb *ClipboardDB) UpdateEntry(entry m.ClipboardEntry) error {
 	_, err := cdb.Exec("UPDATE clipboard SET data = ?, timestamp = ? WHERE id = ?", entry.Data, entry.Timestamp, entry.ID)
 	return err
 }

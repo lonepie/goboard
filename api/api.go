@@ -2,14 +2,23 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/lonepie/goboard/internal/clipboardmonitor"
+	"github.com/lonepie/goboard/internal/db"
+	m "github.com/lonepie/goboard/internal/model"
 )
+
+type ClipboardAPI struct {
+	DB     *db.ClipboardDB
+	Router *gin.Engine
+}
+
+var clipboardAPI *ClipboardAPI
 
 func StartAPI(dbPath string) {
 	router := gin.Default()
@@ -22,7 +31,12 @@ func StartAPI(dbPath string) {
 	}
 
 	//initialize the database
-	clipboardmonitor.NewClipboardDB(dbPath)
+	cbdb, err := db.InitClipboardDB(dbPath)
+	if err != nil {
+		log.Fatalf("Error initializing DB: %v", err)
+	}
+
+	clipboardAPI = &ClipboardAPI{DB: cbdb, Router: router}
 
 	router.Use(cors.New(corsConfig))
 	router.Use(static.Serve("/", static.LocalFile("./frontend/dist", false)))
@@ -38,19 +52,18 @@ func StartAPI(dbPath string) {
 }
 
 func getAllClipboardEntries(c *gin.Context) {
-	// db, err := clipboardmonitor.NewClipboardDB("clipboard.db")
-	// if err != nil {
-	// 	log.Println("Error: ", err)
-	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	// }
-	db := clipboardmonitor.GetClipboardDB()
-	entries, _ := db.ReadEntries()
+	// db := clipboardmonitor.GetClipboardDB()
+	entries, err := clipboardAPI.DB.ReadEntries()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, entries)
 }
 
 func updateClipboardEntry(c *gin.Context) {
 	id := c.Param("id")
-	var entry clipboardmonitor.ClipboardEntry
+	var entry m.ClipboardEntry
 	if err := c.ShouldBindJSON(&entry); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -59,7 +72,8 @@ func updateClipboardEntry(c *gin.Context) {
 	entry.ID = id
 	entry.Timestamp = time.Now()
 
-	err := clipboardmonitor.GetClipboardDB().UpdateEntry(entry)
+	// err := clipboardmonitor.GetClipboardDB().UpdateEntry(entry)
+	err := clipboardAPI.DB.UpdateEntry(entry)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -70,7 +84,8 @@ func updateClipboardEntry(c *gin.Context) {
 
 func deleteClipboardEntry(c *gin.Context) {
 	id := c.Param("id")
-	err := clipboardmonitor.GetClipboardDB().DeleteEntry(id)
+	// err := clipboardmonitor.GetClipboardDB().DeleteEntry(id)
+	err := clipboardAPI.DB.DeleteEntry(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

@@ -7,23 +7,31 @@ import (
 	"log"
 	"time"
 
+	"github.com/lonepie/goboard/internal/db"
+	m "github.com/lonepie/goboard/internal/model"
 	"golang.design/x/clipboard"
 )
 
 type ClipboardMonitor struct {
-	DB        *ClipboardDB
-	EntryChan chan ClipboardEntry
+	DB        *db.ClipboardDB
+	EntryChan chan m.ClipboardEntry
 }
 
-// NewClipboardMonitor creates a new ClipboardDB instance and starts monitoring the clipboard.
-func NewClipboardMonitor(dbPath string) (*ClipboardMonitor, error) {
-	db, err := NewClipboardDB(dbPath)
+// InitClipboardMonitor creates a new ClipboardDB instance and starts monitoring the clipboard.
+func InitClipboardMonitor(dbPath string) (*ClipboardMonitor, error) {
+	db, err := db.InitClipboardDB(dbPath)
 	if err != nil {
 		return nil, err
 	}
 
-	entryChan := make(chan ClipboardEntry)
+	entryChan := make(chan m.ClipboardEntry)
 	monitor := &ClipboardMonitor{DB: db, EntryChan: entryChan}
+
+	err = clipboard.Init()
+	if err != nil {
+		log.Fatalf("Error initializing clipboard: %v", err)
+		// log.Println("Error initializing clipboard:", err)
+	}
 
 	// Start monitoring the clipboard
 	go monitor.monitorClipboard()
@@ -40,15 +48,10 @@ func hash(data string) string {
 
 // monitorClipboard monitors the clipboard for changes and inserts new entries into the database.
 func (monitor *ClipboardMonitor) monitorClipboard() {
-	err := clipboard.Init()
-	if err != nil {
-		log.Println("Error initializing clipboard:", err)
-	}
-
 	ch := clipboard.Watch(context.Background(), clipboard.FmtText)
 	for data := range ch {
 		strData := string(data)
-		entry := ClipboardEntry{
+		entry := m.ClipboardEntry{
 			ID:        hash(strData),
 			Data:      strData,
 			Timestamp: time.Now(),
