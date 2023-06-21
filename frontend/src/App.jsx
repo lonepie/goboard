@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 // import viteLogo from '/vite.svg'
 // import './App.css'
 // import { styled } from '@mui/material/styles'
-import { AppBar, Avatar, Box, Button, InputAdornment, Paper, TextField, Toolbar, Typography } from '@mui/material'
+import { AppBar, Avatar, Box, Button, InputAdornment, Paper, Pagination, TextField, Toolbar, Typography } from '@mui/material'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
@@ -14,6 +14,8 @@ function App() {
   // const [count, setCount] = useState(0)
   const [clipboardEntries, setClipboardEntries] = useState([]);
   const [filterText, setFilterText] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
 
   useEffect(() => {
     fetchClipboardEntries();
@@ -28,6 +30,7 @@ function App() {
 
   const handleFilterChange = (event) => {
     setFilterText(event.target.value);
+    setCurrentPage(1);
   };
   
   const handleRefresh = () => {
@@ -37,6 +40,16 @@ function App() {
   const filteredEntries = clipboardEntries.filter((entry) =>
     entry.Data.toLowerCase().includes(filterText.toLowerCase())
   );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredEntries.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredEntries.length / itemsPerPage);
+
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <>
@@ -69,7 +82,14 @@ function App() {
     </AppBar>
     <Paper elevation={0}>
       <Box>
-        <ClipboardList entries={filteredEntries} filterText={filterText} fetchClipboardEntries={fetchClipboardEntries} />
+        <ClipboardList entries={currentItems} filterText={filterText} fetchClipboardEntries={fetchClipboardEntries} />
+        <Pagination
+          count={totalPages}
+          page={currentPage}
+          onChange={handleChangePage}
+          style={{ display: 'flex', justifyContent: 'center' }}
+          sx={{ mt: 2, pb: 2 }}
+        />
       </Box>
     </Paper>
     </>
