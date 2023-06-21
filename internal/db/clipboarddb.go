@@ -40,7 +40,7 @@ func InitClipboardDB(dbPath string) (*ClipboardDB, error) {
 	}
 
 	clipboardDB = &ClipboardDB{db}
-	defer clipboardDB.Close()
+	// defer clipboardDB.Close()
 
 	return clipboardDB, nil
 }
