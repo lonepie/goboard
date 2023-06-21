@@ -9,6 +9,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/lonepie/goboard/frontend"
 	"github.com/lonepie/goboard/internal/db"
 	m "github.com/lonepie/goboard/internal/model"
 )
@@ -20,7 +21,7 @@ type ClipboardAPI struct {
 
 var clipboardAPI *ClipboardAPI
 
-func StartAPI(dbPath string) {
+func StartAPI(dbPath string, staticFiles string) {
 	router := gin.Default()
 
 	corsConfig := cors.Config{
@@ -39,7 +40,15 @@ func StartAPI(dbPath string) {
 	clipboardAPI = &ClipboardAPI{DB: cbdb, Router: router}
 
 	router.Use(cors.New(corsConfig))
-	router.Use(static.Serve("/", static.LocalFile("./frontend/dist", false)))
+
+	if len(staticFiles) > 0 {
+		log.Printf("Serving static files from path: %v\n", staticFiles)
+		router.Use(static.Serve("/", static.LocalFile(staticFiles, false)))
+	} else {
+		log.Println("Serving static files from embedded fs")
+		router.Use(static.Serve("/", frontend.GetFS(true)))
+	}
+	// router.Use(static.Serve("/", static.LocalFile("./frontend/dist", false)))
 
 	api := router.Group("/api")
 	{

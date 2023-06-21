@@ -15,9 +15,11 @@ var webCmd = &cobra.Command{
 	Long:  `Start web API server listening on port 3000 by default.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// fmt.Println("web called")
-		api.StartAPI(dbPath)
+		api.StartAPI(dbPath, staticFilesPath)
 	},
 }
+
+var staticFilesPath string
 
 func init() {
 	rootCmd.AddCommand(webCmd)
@@ -31,4 +33,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// webCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	webCmd.Flags().StringVar(&staticFilesPath, "staticfiles", "", "Path to static files to serve")
 }
