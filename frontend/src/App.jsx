@@ -40,7 +40,7 @@ function App() {
 
   return (
     <>
-    <AppBar color='primary' position='relative'>
+    <AppBar color='primary' position='sticky'>
       <Toolbar>
           <Avatar sx={{ bgcolor: 'primary.main', display: 'flex', mr: 1 }}>
             <ContentPasteIcon />
