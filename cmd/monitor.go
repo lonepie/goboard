@@ -1,5 +1,5 @@
 /*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+Copyright © 2023 JON ROGERS <LONEPIE@GMAIL.COM>
 */
 package cmd
 
@@ -25,8 +25,8 @@ var monitorCmd = &cobra.Command{
 		if bSystray {
 			systray.Run(func() {
 				systray.SetIcon(icon.Data)
-				systray.SetTitle("goboard")
-				systray.SetTooltip("goboard")
+				systray.SetTitle("goBoard")
+				systray.SetTooltip("goBoard")
 				mQuit := systray.AddMenuItem("Quit", "Quit")
 				go func() {
 					<-mQuit.ClickedCh
