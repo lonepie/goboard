@@ -177,11 +177,12 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
               primary={highlightText(entry.Data)}
               primaryTypographyProps={{ component: 'div', noWrap: true, maxWidth: 'md'}}
               secondary={entry.Timestamp}
+              sx={{ ml: 1 }}
             />
           </ListItem>
         ))}
       </List>
-      <Dialog open={openEditDialog} onClose={handleEditCancel} fullWidth>
+      <Dialog open={openEditDialog} onClose={handleEditCancel} fullWidth PaperProps={{elevation: 1}}>
         <DialogTitle>Edit Clipboard Entry</DialogTitle>
         <DialogContent>
           <TextField
@@ -191,6 +192,8 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
             type="text"
             fullWidth
             multiline
+            variant='outlined'
+            inputProps={{spellCheck: false, style: {fontFamily: "'Roboto Mono', monospace"}}}
             value={editedData}
             onChange={(e) => setEditedData(e.target.value)}
           />
@@ -204,7 +207,7 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={openDeleteDialog} onClose={handleDeleteCancel}>
+      <Dialog open={openDeleteDialog} onClose={handleDeleteCancel} PaperProps={{elevation: 1}}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>

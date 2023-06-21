@@ -58,7 +58,7 @@ function App() {
           <Avatar sx={{ bgcolor: 'primary.main', display: 'flex', mr: 1 }}>
             <ContentPasteIcon />
           </Avatar>
-          <Typography variant='h6' noWrap component='div' sx={{ display: 'flex', mr: 2, textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
+          <Typography variant='h6' noWrap component='div' sx={{ display: 'flex', ml: 1, textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
             goBoard Entries
           </Typography>
           <TextField 
