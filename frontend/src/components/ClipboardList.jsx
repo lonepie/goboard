@@ -159,7 +159,7 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
               <IconButton
                 onClick={(event) => handleMenuOpen(event, entry)}
               >
-                <Avatar>
+                <Avatar sx={{ bgcolor: 'secondary.main'}}>
                   <TextSnippetIcon />
                 </Avatar>
               </IconButton>
@@ -181,7 +181,7 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
           </ListItem>
         ))}
       </List>
-      <Dialog open={openEditDialog} onClose={handleEditCancel}>
+      <Dialog open={openEditDialog} onClose={handleEditCancel} fullWidth>
         <DialogTitle>Edit Clipboard Entry</DialogTitle>
         <DialogContent>
           <TextField
@@ -190,6 +190,7 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
             label="Data"
             type="text"
             fullWidth
+            multiline
             value={editedData}
             onChange={(e) => setEditedData(e.target.value)}
           />

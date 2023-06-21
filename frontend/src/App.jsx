@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 // import viteLogo from '/vite.svg'
 // import './App.css'
 // import { styled } from '@mui/material/styles'
-import { AppBar, Avatar, Box, Button, Grid, IconButton, Paper, TextField, Toolbar, Typography } from '@mui/material'
+import { AppBar, Avatar, Box, Button, InputAdornment, Paper, TextField, Toolbar, Typography } from '@mui/material'
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SearchIcon from '@mui/icons-material/Search';
 import ClipboardList from './components/ClipboardList';
 
 
@@ -39,22 +40,35 @@ function App() {
 
   return (
     <>
-    <AppBar color='primary' position='static'>
+    <AppBar color='primary' position='relative'>
       <Toolbar>
-          <Avatar sx={{ color: 'text.primary', bgcolor: 'primary.main', display: 'flex', mr: 1 }}>
+          <Avatar sx={{ bgcolor: 'primary.main', display: 'flex', mr: 1 }}>
             <ContentPasteIcon />
           </Avatar>
           <Typography variant='h6' noWrap component='div' sx={{ display: 'flex', mr: 2, textDecoration: 'none', color: 'inherit', flexGrow: 1 }}>
             goBoard Entries
           </Typography>
+          <TextField 
+            label="Filter"
+            value={filterText}
+            onChange={handleFilterChange}
+            size='small'
+            sx={{ mr: 2 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
           <Box>
             <Button variant='outlined' startIcon={<RefreshIcon />} onClick={handleRefresh}>Refresh</Button>
           </Box>
       </Toolbar>
     </AppBar>
-    <Paper>
+    <Paper elevation={0}>
       <Box>
-        <TextField label="Filter" value={filterText} onChange={handleFilterChange} fullWidth margin='normal' />
         <ClipboardList entries={filteredEntries} filterText={filterText} fetchClipboardEntries={fetchClipboardEntries} />
       </Box>
     </Paper>
