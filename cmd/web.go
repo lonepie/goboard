@@ -15,11 +15,12 @@ var webCmd = &cobra.Command{
 	Long:  `Start web API server listening on port 3000 by default.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// fmt.Println("web called")
-		api.StartAPI(dbPath, staticFilesPath)
+		api.StartAPI(dbPath, staticFilesPath, serverPort)
 	},
 }
 
 var staticFilesPath string
+var serverPort int
 
 func init() {
 	rootCmd.AddCommand(webCmd)
@@ -34,4 +35,5 @@ func init() {
 	// is called directly, e.g.:
 	// webCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	webCmd.Flags().StringVar(&staticFilesPath, "staticfiles", "", "Path to static files to serve")
+	webCmd.Flags().IntVarP(&serverPort, "port", "p", 3000, "Port for webserver to listen on")
 }

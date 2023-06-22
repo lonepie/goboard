@@ -53,7 +53,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// monitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	monitorCmd.Flags().BoolVar(&bSystray, "systray", false, "Enable systray")
+	monitorCmd.Flags().BoolVar(&bSystray, "systray", true, "Enable/disable systray icon")
 }
 
 func startMonitor() {

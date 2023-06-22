@@ -21,7 +21,7 @@ type ClipboardAPI struct {
 
 var clipboardAPI *ClipboardAPI
 
-func StartAPI(dbPath string, staticFiles string) {
+func StartAPI(dbPath string, staticFiles string, port int) {
 	router := gin.Default()
 
 	corsConfig := cors.Config{
@@ -57,7 +57,7 @@ func StartAPI(dbPath string, staticFiles string) {
 		api.DELETE("/clipboard/:id", deleteClipboardEntry)
 	}
 
-	router.Run(":3000")
+	router.Run(fmt.Sprintf(":%v", port))
 }
 
 func getAllClipboardEntries(c *gin.Context) {
