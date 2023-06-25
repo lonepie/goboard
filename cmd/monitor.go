@@ -57,10 +57,11 @@ func init() {
 }
 
 func startMonitor() {
-	monitor, err := clipboardmonitor.InitClipboardMonitor(dbPath)
+	monitor, err := clipboardmonitor.NewClipboardMonitor(dbPath)
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
+	go monitor.MonitorClipboard()
 	log.Println("Monitoring Clipboard...")
 	for entry := range monitor.EntryChan {
 		log.Println("New clip:", strings.TrimSpace(entry.Data))

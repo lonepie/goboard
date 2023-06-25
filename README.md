@@ -14,3 +14,4 @@ goBoard accepts the following arguments:
 `goboard web` - start REST API and React Web UI on http://localhost:3000
 `goboard ls` - list clipboard history
 `goboard cp <id>` - copy history item directly by ID
+`goboard fullstack` - run both the clipboard monitor service and the web frontend/API

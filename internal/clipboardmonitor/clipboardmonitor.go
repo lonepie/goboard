@@ -17,8 +17,8 @@ type ClipboardMonitor struct {
 	EntryChan chan m.ClipboardEntry
 }
 
-// InitClipboardMonitor creates a new ClipboardDB instance and starts monitoring the clipboard.
-func InitClipboardMonitor(dbPath string) (*ClipboardMonitor, error) {
+// NewClipboardMonitor creates a new ClipboardMonitor instance.
+func NewClipboardMonitor(dbPath string) (*ClipboardMonitor, error) {
 	db, err := db.InitClipboardDB(dbPath)
 	if err != nil {
 		return nil, err
@@ -30,29 +30,21 @@ func InitClipboardMonitor(dbPath string) (*ClipboardMonitor, error) {
 	err = clipboard.Init()
 	if err != nil {
 		log.Fatalf("Error initializing clipboard: %v", err)
-		// log.Println("Error initializing clipboard:", err)
 	}
 
 	// Start monitoring the clipboard
-	go monitor.monitorClipboard()
+	// go monitor.monitorClipboard()
 
 	return monitor, nil
 }
 
-func hash(data string) string {
-	return fmt.Sprintf("%x", md5.Sum([]byte(data)))
-	// h := md5.New()
-	// h.Write([]byte(data))
-	// return hex.EncodeToString(h.Sum(nil))
-}
-
-// monitorClipboard monitors the clipboard for changes and inserts new entries into the database.
-func (monitor *ClipboardMonitor) monitorClipboard() {
+// MonitorClipboard monitors the clipboard for changes and inserts new entries into the database.
+func (monitor *ClipboardMonitor) MonitorClipboard() {
 	ch := clipboard.Watch(context.Background(), clipboard.FmtText)
 	for data := range ch {
 		strData := string(data)
 		entry := m.ClipboardEntry{
-			ID:        hash(strData),
+			ID:        fmt.Sprintf("%x", md5.Sum([]byte(strData))),
 			Data:      strData,
 			Timestamp: time.Now(),
 		}
@@ -60,9 +52,3 @@ func (monitor *ClipboardMonitor) monitorClipboard() {
 		monitor.EntryChan <- entry
 	}
 }
-
-// func (entry *ClipboardEntry) WriteToClipboard() {
-// 	clipboard.Init()
-// 	clipboard.Write(clipboard.FmtText, []byte(entry.Data))
-// 	log.Println("Wrote entry to clipboard:", entry.RowID)
-// }
