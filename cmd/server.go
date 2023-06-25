@@ -4,9 +4,12 @@ Copyright © 2023 JON ROGERS <LONEPIE@GMAIL.COM>
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/getlantern/systray"
 	"github.com/lonepie/goboard/api"
 	"github.com/lonepie/goboard/assets/icon"
+	"github.com/skratchdot/open-golang/open"
 	"github.com/spf13/cobra"
 )
 
@@ -40,10 +43,17 @@ func initSystray() {
 			systray.SetIcon(icon.Data)
 			systray.SetTitle("goBoard")
 			systray.SetTooltip("goBoard")
+			mUrl := systray.AddMenuItem("Open UI", "Open UI")
 			mQuit := systray.AddMenuItem("Quit", "Quit")
 			go func() {
-				<-mQuit.ClickedCh
-				systray.Quit()
+				for {
+					select {
+					case <-mUrl.ClickedCh:
+						open.Run(fmt.Sprintf("http://localhost:%v", serverPort))
+					case <-mQuit.ClickedCh:
+						systray.Quit()
+					}
+				}
 			}()
 			go api.StartAPI(dbPath, staticFilesPath, serverPort)
 			StartMonitor()
