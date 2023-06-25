@@ -7,13 +7,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/getlantern/systray"
-	"github.com/lonepie/goboard/assets/icon"
 	"github.com/lonepie/goboard/internal/clipboardmonitor"
 	"github.com/spf13/cobra"
 )
-
-var bSystray bool
 
 // monitorCmd represents the monitor command
 var monitorCmd = &cobra.Command{
@@ -22,22 +18,7 @@ var monitorCmd = &cobra.Command{
 	Long:  `Monitor clipboard history and save in sqlite database.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// fmt.Println("monitor called")
-		if bSystray {
-			systray.Run(func() {
-				systray.SetIcon(icon.Data)
-				systray.SetTitle("goBoard")
-				systray.SetTooltip("goBoard")
-				mQuit := systray.AddMenuItem("Quit", "Quit")
-				go func() {
-					<-mQuit.ClickedCh
-					systray.Quit()
-				}()
-				startMonitor()
-			}, func() {
-			})
-		} else {
-			startMonitor()
-		}
+		StartMonitor()
 	},
 }
 
@@ -53,10 +34,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// monitorCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	monitorCmd.Flags().BoolVar(&bSystray, "systray", true, "Enable/disable systray icon")
 }
 
-func startMonitor() {
+func StartMonitor() {
 	monitor, err := clipboardmonitor.NewClipboardMonitor(dbPath)
 	if err != nil {
 		log.Fatalln("Error:", err)
