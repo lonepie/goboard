@@ -16,6 +16,7 @@ import {
   DialogActions,
   DialogContentText,
   TextField,
+  Tooltip,
 } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
@@ -156,13 +157,15 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
             </Button>
           }>
             <ListItemAvatar>
-              <IconButton
-                onClick={(event) => handleMenuOpen(event, entry)}
-              >
-                <Avatar sx={{ bgcolor: 'secondary.main'}}>
-                  <TextSnippetIcon />
-                </Avatar>
-              </IconButton>
+              <Tooltip title="Actions Menu" arrow>
+                <IconButton
+                  onClick={(event) => handleMenuOpen(event, entry)}
+                >
+                  <Avatar sx={{ bgcolor: 'secondary.main'}}>
+                    <TextSnippetIcon />
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
               <Menu
                 anchorEl={anchorEl}
                 keepMounted
@@ -173,12 +176,16 @@ const ClipboardList = ({ entries, filterText, fetchClipboardEntries }) => {
                 <MenuItem onClick={() => handleDelete(entry)}>Delete</MenuItem>
               </Menu>
             </ListItemAvatar>
-            <ListItemText 
-              primary={highlightText(entry.Data)}
-              primaryTypographyProps={{ component: 'div', noWrap: true, maxWidth: 'md'}}
-              secondary={entry.Timestamp}
-              sx={{ ml: 1 }}
-            />
+              <ListItemText 
+                primary={
+                  <Tooltip title={entry.Data} arrow followCursor>
+                    <div>{highlightText(entry.Data)}</div>
+                  </Tooltip>
+                }
+                primaryTypographyProps={{ component: 'div', noWrap: true, maxWidth: 'md'}}
+                secondary={entry.Timestamp}
+                sx={{ ml: 1 }}
+              />
           </ListItem>
         ))}
       </List>

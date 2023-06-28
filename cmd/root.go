@@ -37,7 +37,7 @@ func init() {
 	// will be global for your application.
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.goboard.yaml)")
-	rootCmd.PersistentFlags().StringVar(&dbPath, "db", "clipboard.db", "database file path")
+	rootCmd.PersistentFlags().StringVar(&dbPath, "db", "goboard.db", "database file path")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
